@@ -77,4 +77,49 @@ describe('Wallet', async function () {
             expect(balance).toBe(amount1 + amount2)
         })
     })
+
+    describe('withdraw()', function () {
+        it('Should emit the Withdraw event when calling withdraw()', async function () {
+            const wallet = await viem.deployContract('Wallet')
+            const amount = parseEther('1')
+
+            await wallet.write.deposit([], { value: amount })
+
+            await viem.assertions.emitWithArgs(
+                wallet.write.withdraw([bob.account.address, amount]),
+                wallet,
+                'Withdraw',
+                [getAddress(owner.account.address), getAddress(bob.account.address), amount],
+            )
+        })
+
+        it('Should decrease balance after withdraw', async function () {
+            const wallet = await viem.deployContract('Wallet')
+            const depositAmount = parseEther('3')
+            const withdrawAmount = parseEther('1')
+
+            await wallet.write.deposit([], { value: depositAmount })
+            await wallet.write.withdraw([owner.account.address, withdrawAmount])
+
+            const balance = await wallet.read.balanceOf([owner.account.address])
+            expect(balance).toBe(depositAmount - withdrawAmount)
+        })
+    })
+
+    describe('balanceOf()', function () {
+        it('Should revert with ZeroAddress when querying zero address', async function () {
+            const wallet = await viem.deployContract('Wallet')
+
+            expect(
+                wallet.read.balanceOf(['0x0000000000000000000000000000000000000000']),
+            ).rejects.toThrow('ZeroAddress')
+        })
+
+        it('Should return 0 for an account with no deposits', async function () {
+            const wallet = await viem.deployContract('Wallet')
+
+            const balance = await wallet.read.balanceOf([alice.account.address])
+            expect(balance).toBe(0)
+        })
+    })
 })
