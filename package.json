@@ -1,17 +1,21 @@
 {
     "name": "wallet",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "type": "module",
-    "dependencies": {
-        "solc": "^0.8.34"
+    "scripts": {
+        "compile": "hardhat compile",
+        "test": "hardhat test",
+        "node": "hardhat node",
+        "deploy": "hardhat ignition deploy",
+        "clean": "hardhat clean",
+        "lint": "oxlint",
+        "format": "prettier --write ."
     },
     "devDependencies": {
         "@nomicfoundation/hardhat-ignition": "^3.1.2",
         "@nomicfoundation/hardhat-toolbox-viem": "^5.0.4",
         "@nomicfoundation/solidity-language-server": "^0.8.25",
-        "@nomiclabs/hardhat-solhint": "^4.1.2",
-        "@types/bun": "^1.3.12",
-        "@types/node": "^22.8.5",
+        "@types/node": "^25.6.0",
         "forge-std": "foundry-rs/forge-std#v1.9.4",
         "hardhat": "^3.4.0",
         "oxfmt": "^0.46.0",
