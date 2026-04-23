@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.28;
 
-/// @title A title that should describe the contract/interface
-/// @author The name of the author
-/// @notice Explain to an end user what this does
-/// @dev Explain to a developer any extra details
+/// @title Safe address library for ETH transfers
+/// @notice Provides utility functions for sending Ether safely
+/// @dev Uses low-level call to transfer ETH, reverts on failure
 library Address {
     error SendValueFailed();
 
-    /// @notice Explain to an end user what this does
-    /// @dev Explain to a developer any extra details
-    /// @param recipient a parameter just like in doxygen (must be followed by parameter name)
-    /// @param amount a parameter just like in doxygen (must be followed by parameter name)
+    /// @notice Sends Ether to a recipient address
+    /// @dev Reverts if the transfer fails
+    /// @param recipient The address to send ETH to
+    /// @param amount The amount of ETH to send in wei
     function sendValue(address payable recipient, uint256 amount) internal {
         (bool success, ) = recipient.call{ value: amount }("");
         if (!success) revert SendValueFailed();

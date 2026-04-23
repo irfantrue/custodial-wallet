@@ -235,6 +235,87 @@ describe('Wallet', async () => {
         })
     })
 
+    describe('Ownable', async () => {
+        it('Should set deployer as initial owner', async () => {
+            const wallet = await viem.deployContract('Wallet')
+            const ownerAddress = await wallet.read.owner()
+            assert.strictEqual(ownerAddress, getAddress(owner.account.address))
+        })
+
+        it('Should emit OwnershipTransferred when transferring ownership', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            const txHash = wallet.write.transferOwnership([alice.account.address])
+            await publicClient.waitForTransactionReceipt({
+                hash: await txHash,
+            })
+
+            await viem.assertions.emitWithArgs(txHash, wallet, 'OwnershipTransferred', [
+                getAddress(owner.account.address),
+                getAddress(alice.account.address),
+            ])
+        })
+
+        it('Should transfer ownership to new owner', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            await wallet.write.transferOwnership([alice.account.address])
+
+            const newOwner = await wallet.read.owner()
+            assert.strictEqual(newOwner, getAddress(alice.account.address))
+        })
+
+        it('Should revert Unauthorized when non-owner transfers ownership', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            await assert.rejects(
+                wallet.write.transferOwnership([bob.account.address], { account: alice.account }),
+                /Unauthorized/,
+            )
+        })
+
+        it('Should revert ZeroAddress when transferring to zero address', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            await assert.rejects(
+                wallet.write.transferOwnership(['0x0000000000000000000000000000000000000000']),
+                /ZeroAddress/,
+            )
+        })
+
+        it('Should emit OwnershipTransferred when renouncing ownership', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            const txHash = wallet.write.renounceOwnership()
+            await publicClient.waitForTransactionReceipt({
+                hash: await txHash,
+            })
+
+            await viem.assertions.emitWithArgs(txHash, wallet, 'OwnershipTransferred', [
+                getAddress(owner.account.address),
+                '0x0000000000000000000000000000000000000000',
+            ])
+        })
+
+        it('Should set owner to zero address after renouncing ownership', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            await wallet.write.renounceOwnership()
+
+            const currentOwner = await wallet.read.owner()
+            assert.strictEqual(currentOwner, '0x0000000000000000000000000000000000000000')
+        })
+
+        it('Should revert Unauthorized when non-owner renounces ownership', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            await assert.rejects(
+                wallet.write.renounceOwnership({ account: alice.account }),
+                /Unauthorized/,
+            )
+        })
+    })
+
     describe('balanceOf()', () => {
         it('Should revert with ZeroAddress when querying zero address', async () => {
             const wallet = await viem.deployContract('Wallet')
