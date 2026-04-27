@@ -67,7 +67,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Run slither
-              run: slither contracts/ --filter-paths 'node_modules|\t.t.sol' --exclude low-level-calls,dead-code
+              run: pnpm slither
 
     gas:
         name: Gas Analysis
