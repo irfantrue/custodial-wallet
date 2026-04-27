@@ -1,5 +1,5 @@
 {
-    "name": "wallet",
+    "name": "custodial-wallet",
     "version": "0.1.0",
     "type": "module",
     "scripts": {

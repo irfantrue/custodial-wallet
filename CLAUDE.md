@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Hardhat 3 beta project featuring a Solidity wallet smart contract with deposit/withdraw functionality. Uses viem for Ethereum interactions and node:test for testing.
+Hardhat 3 beta project featuring a Solidity custodial wallet smart contract with deposit/withdraw, pause/unpause, reentrancy protection, and ownership control. Uses viem for Ethereum interactions and node:test for testing.
 
 ## Commands
 
@@ -49,13 +49,14 @@ ReentrancyGuard (abstract)
     ↓
 Ownable (abstract) - inherits ReentrancyGuard
     ↓
-Wallet (concrete) - inherits Ownable
+Wallet (concrete) - inherits Ownable, Pausable
 ```
 
 ### Contract Files
 
-- `contracts/Wallet.sol` - Main wallet with deposit/withdraw (owner-only withdraw)
+- `contracts/Wallet.sol` - Main wallet with deposit/withdraw, pause/unpause
 - `contracts/Ownable.sol` - Access control with owner, transferOwnership, renounceOwnership
+- `contracts/Pausable.sol` - Pause/unpause functionality for emergency situations
 - `contracts/ReentrancyGuard.sol` - NonReentrant modifier for reentrancy protection
 - `contracts/Address.sol` - Library for safe ETH transfer (sendValue)
 
@@ -66,11 +67,12 @@ Wallet (concrete) - inherits Ownable
 - Transaction history stored per account (deposits and withdrawals)
 - Total balances tracking across all accounts
 - Reentrancy protection on withdraw
+- Pause/unpause functionality for emergency control
 - Custom errors and events
 
 ### Test File
 
-- `test/Wallet.ts` - 25 comprehensive tests covering deposit, withdraw, receive, balance queries, and Ownable functionality
+- `test/Wallet.ts` - Comprehensive tests covering deposit, withdraw, receive, pause/unpause, balance queries, and Ownable functionality
 
 ## Network Configuration
 

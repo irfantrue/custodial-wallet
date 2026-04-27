@@ -180,10 +180,10 @@ describe('Wallet', async () => {
                 blockNumber: receipt.blockNumber,
             })
 
-            const withdrawl = await wallet.read.getWithdrawal([owner.account.address, 0n])
+            const withdrawal = await wallet.read.getWithdrawal([owner.account.address, 0n])
 
-            assert.strictEqual(withdrawl.amount, amount)
-            assert.strictEqual(withdrawl.timestamp, block.timestamp)
+            assert.strictEqual(withdrawal.amount, amount)
+            assert.strictEqual(withdrawal.timestamp, block.timestamp)
         })
 
         it('Should revert with InsufficientBalance when amount exceeds balance', async () => {
@@ -269,7 +269,9 @@ describe('Wallet', async () => {
             const wallet = await viem.deployContract('Wallet')
 
             await assert.rejects(
-                wallet.write.transferOwnership([bob.account.address], { account: alice.account }),
+                wallet.write.transferOwnership([bob.account.address], {
+                    account: alice.account,
+                }),
                 /Unauthorized/,
             )
         })
@@ -331,6 +333,109 @@ describe('Wallet', async () => {
 
             const balance = await wallet.read.balanceOf([alice.account.address])
             assert.strictEqual(balance, BigInt(0))
+        })
+    })
+
+    describe('Pausable', () => {
+        it('Should set initial state as not paused', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            const isPaused = await wallet.read.isPaused()
+            assert.strictEqual(isPaused, false)
+        })
+
+        it('Should allow deposit when not paused', async () => {
+            const wallet = await viem.deployContract('Wallet')
+            const amount = parseEther('1')
+
+            await wallet.write.deposit({ value: amount })
+
+            const balance = await wallet.read.balanceOf([owner.account.address])
+            assert.strictEqual(balance, amount)
+        })
+
+        it('Should allow withdraw when not paused', async () => {
+            const wallet = await viem.deployContract('Wallet')
+            const depositAmount = parseEther('2')
+            const withdrawAmount = parseEther('1')
+
+            await wallet.write.deposit({ value: depositAmount })
+            await wallet.write.withdraw([bob.account.address, withdrawAmount])
+
+            const balance = await wallet.read.balanceOf([owner.account.address])
+            assert.strictEqual(balance, depositAmount - withdrawAmount)
+        })
+
+        it('Should revert with Paused when deposit while paused', async () => {
+            const wallet = await viem.deployContract('Wallet')
+            const depositAmount = parseEther('1')
+
+            await wallet.write.pause()
+
+            await assert.rejects(wallet.write.deposit({ value: depositAmount }), /Paused/)
+        })
+
+        it('Should revert with Paused when withdraw while paused', async () => {
+            const wallet = await viem.deployContract('Wallet')
+            const amount = parseEther('1')
+
+            await wallet.write.deposit({ value: amount })
+            await wallet.write.pause()
+
+            await assert.rejects(wallet.write.withdraw([bob.account.address, amount]), /Paused/)
+        })
+
+        it('Should revert with Paused when receive ETH while paused', async () => {
+            const wallet = await viem.deployContract('Wallet')
+            const amount = parseEther('1')
+
+            await wallet.write.pause()
+
+            await assert.rejects(
+                owner.sendTransaction({
+                    to: wallet.address,
+                    value: amount,
+                }),
+                /Paused/,
+            )
+        })
+
+        it('Should allow deposit after unpause', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            await wallet.write.pause()
+            await wallet.write.unpause()
+
+            await wallet.write.deposit({ value: parseEther('1') })
+
+            const balance = await wallet.read.balanceOf([owner.account.address])
+            assert.strictEqual(balance, parseEther('1'))
+        })
+
+        it('Should allow withdraw after unpause', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            await wallet.write.deposit({ value: parseEther('2') })
+            await wallet.write.pause()
+            await wallet.write.unpause()
+            await wallet.write.withdraw([bob.account.address, parseEther('1')])
+
+            const balance = await wallet.read.balanceOf([owner.account.address])
+            assert.strictEqual(balance, parseEther('1'))
+        })
+
+        it('Should revert Unauthorized when non-owner calls pause', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            await assert.rejects(wallet.write.pause({ account: alice.account }), /Unauthorized/)
+        })
+
+        it('Should revert Unauthorized when non-owner calls unpause', async () => {
+            const wallet = await viem.deployContract('Wallet')
+
+            await wallet.write.pause()
+
+            await assert.rejects(wallet.write.unpause({ account: alice.account }), /Unauthorized/)
         })
     })
 })

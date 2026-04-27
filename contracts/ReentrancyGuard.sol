@@ -10,12 +10,12 @@ abstract contract ReentrancyGuard {
 
     uint256 private _status;
 
-    error Reentrancy();
+    error ReentrancyFailed();
 
     /// @notice Prevents a contract from calling itself, directly or indirectly
     /// @dev Setting status to ENTERED before function execution and NOT_ENTERED after
     modifier nonReentrant() {
-        if (_status == _ENTERED) revert Reentrancy();
+        if (_status == _ENTERED) revert ReentrancyFailed();
         _status = _ENTERED;
         _;
         _status = _NOT_ENTERED;

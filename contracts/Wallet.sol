@@ -2,15 +2,16 @@
 pragma solidity ^0.8.28;
 
 import { Ownable } from "./Ownable.sol";
+import { Pausable } from "./Pausable.sol";
 import { Address } from "./Address.sol";
 
 /// @title Wallet
 /// @notice A simple wallet contract with deposit and withdraw functionality
-/// @author Your Name
+/// @author Irfan Nurul Susilo
 /// @dev Inherits from Ownable for access control and reentrancy protection
 /// @dev Users can deposit ETH and track their balance
 /// @dev Only the owner can withdraw funds from any account
-contract Wallet is Ownable {
+contract Wallet is Ownable, Pausable {
     using Address for address payable;
 
     /// @notice Represents a single transaction record
@@ -102,7 +103,7 @@ contract Wallet is Ownable {
     /// @notice Deposits ETH into the caller's account
     /// @dev Stores the deposit and emits a Deposited event
     /// @dev Reverts if amount is zero
-    function deposit() external payable {
+    function deposit() external payable whenNotPaused {
         _deposit(msg.sender, msg.value);
     }
 
@@ -111,14 +112,30 @@ contract Wallet is Ownable {
     /// @dev Uses nonReentrant modifier to prevent reentrancy attacks
     /// @param to The address to receive the withdrawn ETH
     /// @param amount The amount to withdraw in wei
-    function withdraw(address payable to, uint256 amount) external onlyOwner nonReentrant {
+    function withdraw(
+        address payable to,
+        uint256 amount
+    ) external onlyOwner nonReentrant whenNotPaused {
         _withdraw(msg.sender, to, amount);
     }
 
     /// @notice Fallback function to receive plain ETH transfers
     /// @dev Automatically deposits ETH sent directly to the contract
-    receive() external payable {
+    receive() external payable whenNotPaused {
         _deposit(msg.sender, msg.value);
+    }
+
+    /// @notice Pauses the contract, preventing all deposits and withdrawals
+    /// @dev Can only be called by the owner
+    /// @dev All functions using whenNotPaused modifier will revert
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /// @notice Unpauses the contract, allowing deposits and withdrawals to resume
+    /// @dev Can only be called by the owner
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     /// @dev Internal function to handle deposits
