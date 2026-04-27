@@ -54,6 +54,18 @@ jobs:
             - name: Run slither
               run: slither contracts/ --exclude low-level-calls,dead-code
 
+    gas:
+        name: Gas Analysis
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install foundry
+              uses: foundry-rs/foundry-toolchain@v1
+
+            - name: Run gas report
+              run: forge test --match-path contracts/Wallet.t.sol --gas-report
+
     format:
         name: Format Check
         runs-on: ubuntu-latest
