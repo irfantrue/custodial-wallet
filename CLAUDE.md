@@ -30,7 +30,7 @@ pnpm run node
 # Deploy contracts via Ignition
 pnpm run deploy
 
-# Clean artifacts and cache
+# Clean artifacts and cache (Hardhat + Foundry out/)
 pnpm run clean
 
 # Lint with oxlint
@@ -38,6 +38,15 @@ pnpm run lint
 
 # Format code
 pnpm run format
+
+# Security analysis with Slither
+pnpm slither
+
+# Gas report (Foundry)
+pnpm run gas-report
+
+# Coverage report (Foundry)
+pnpm run coverage
 ```
 
 ## Architecture
@@ -70,9 +79,10 @@ Wallet (concrete) - inherits Ownable, Pausable
 - Pause/unpause functionality for emergency control
 - Custom errors and events
 
-### Test File
+### Test Files
 
 - `test/Wallet.ts` - Comprehensive tests covering deposit, withdraw, receive, pause/unpause, balance queries, and Ownable functionality
+- `contracts/Wallet.t.sol` - Foundry tests for Wallet contract (gas-optimized tests)
 
 ## Network Configuration
 
@@ -88,3 +98,4 @@ Hardhat config (`hardhat.config.ts`) includes:
 - Formatting: prettier with solidity plugin
 - Solidity version: 0.8.28
 - EVM target: cancun
+- Testing: Hardhat (node:test) + Foundry (Wallet.t.sol)
