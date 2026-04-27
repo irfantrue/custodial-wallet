@@ -9,7 +9,7 @@
         "deploy": "hardhat ignition deploy",
         "clean": "hardhat clean",
         "lint": "oxlint",
-        "format": "prettier --write ."
+        "format": "prettier --write . && oxfmt ."
     },
     "devDependencies": {
         "@nomicfoundation/hardhat-ignition": "^3.1.2",
