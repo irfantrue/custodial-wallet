@@ -51,6 +51,9 @@ jobs:
                   solc-select install 0.8.28
                   solc-select use 0.8.28
 
+            - name: Install foundry
+              uses: foundry-rs/foundry-toolchain@v1
+
             - name: Run slither
               run: slither contracts/ --exclude low-level-calls,dead-code
 
