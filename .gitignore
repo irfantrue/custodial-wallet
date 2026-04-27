@@ -27,5 +27,8 @@
 # Gas snapshot files
 /.gas-snapshot
 
+# Forge coverage reports
+lcov.info
+
 # Snapshot cheatcodes output
 /snapshots
