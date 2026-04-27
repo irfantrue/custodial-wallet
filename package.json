@@ -9,7 +9,8 @@
         "deploy": "hardhat ignition deploy",
         "clean": "hardhat clean",
         "lint": "oxlint",
-        "format": "prettier --write . && oxfmt ."
+        "format": "oxfmt '**/*.ts' '**/*.json' && prettier --write '**/*.yml' '**/*.yaml' '**/*.sol'",
+        "format:check": "oxfmt --check '**/*.ts' '**/*.json' && prettier --check '**/*.yml' '**/*.yaml' '**/*.sol'"
     },
     "devDependencies": {
         "@nomicfoundation/hardhat-ignition": "^3.1.2",

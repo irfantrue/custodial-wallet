@@ -19,8 +19,8 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: '22'
-                  cache: 'pnpm'
+                  node-version: "22"
+                  cache: "pnpm"
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -43,14 +43,14 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: '22'
-                  cache: 'pnpm'
+                  node-version: "22"
+                  cache: "pnpm"
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
             - name: Check formatting
-              run: pnpm run format --check
+              run: pnpm run format:check
 
     compile:
         name: Compile Contracts
@@ -64,8 +64,8 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: '22'
-                  cache: 'pnpm'
+                  node-version: "22"
+                  cache: "pnpm"
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -85,8 +85,8 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: '22'
-                  cache: 'pnpm'
+                  node-version: "22"
+                  cache: "pnpm"
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
