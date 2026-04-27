@@ -66,6 +66,18 @@ jobs:
             - name: Run gas report
               run: forge test --match-path contracts/Wallet.t.sol --gas-report
 
+    coverage:
+        name: Coverage
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install foundry
+              uses: foundry-rs/foundry-toolchain@v1
+
+            - name: Run coverage
+              run: forge coverage --match-path contracts/Wallet.t.sol
+
     format:
         name: Format Check
         runs-on: ubuntu-latest
